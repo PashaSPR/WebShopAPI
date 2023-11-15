@@ -1,0 +1,1090 @@
+видаляє модулі Node Remove-Item -Recurse -Force node_modules
+-----------------------------------------------------
+
+-----------------------------------------------------
+public GoodsOrdersDTO createGoodsOrders(GoodsOrdersDTO goodsOrdersDTO) throws GoodsOrdersNotFoundException {
+
+
+        ordersListsRepository.findById(goodsOrdersDTO.getOrdersListsDTO().getCustomers().getId()).orElse(null).getId();
+        
+        GoodsOrdersEntity goodsOrdersEntity = new GoodsOrdersEntity();
+        
+        goodsOrdersEntity.setQuantity(goodsOrdersDTO.getQuantity());
+        goodsOrdersEntity.setPrice(goodsOrdersDTO.getPrice());
+        goodsOrdersEntity =goodsOrdersRepository.save(goodsOrdersEntity);
+
+        return entityToDTO(goodsOrdersEntity);
+    }
+	public GoodsOrdersDTO entityToDTO(GoodsOrdersEntity entity) {
+        GoodsOrdersDTO dto = new GoodsOrdersDTO();
+        dto.setId(entity.getId());
+        dto.setPrice(entity.getPrice());
+        dto.setQuantity(entity.getQuantity());
+
+        return dto;
+    }
+	{
+        
+        "price": 100.0,
+        "quantity": 2
+    }
+	@Entity
+@Table(name = "goodsinvoices")
+public class GoodsInvoicesEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // Унікальний ідентифікатор Переліку товару
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "goods_id", referencedColumnName = "id")
+    // Зв'язок Many-to-One: Багато Накладних на товар може належати одному Товару
+    private GoodsEntity goods;
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "sellers_id", referencedColumnName = "id")
+    // Зв'язок Many-to-One: Багато Накладних на товар може належати одному Продавцю
+    private SellersEntity sellers;
+
+
+    /////////сутності що мають відношення One-to-Many з сутністю Goods
+    @OneToMany(mappedBy = "goodsInvoices")
+    @JsonManagedReference
+    // Зв'язок One-to-Many: Один товар може належати до багатьох Переліків Товарів в замовленні Покупця
+    private List<GoodsOrdersEntity> goodsOrders = new ArrayList<>();
+
+
+
+
+    private Float price; // Ціна товару
+    private Integer quantity; // Кількість товару
+	}
+	і в контроллері:
+	    @PostMapping
+    public ResponseEntity<GoodsInvoicesDTO> createGoodsInvoices(@RequestBody GoodsInvoicesToSaveDTO goodsInvoicesToSaveDTO) {
+        try {
+            Optional<GoodsEntity> goodsEntityOptional = goodsRepository.findById(goodsInvoicesToSaveDTO.getGoodsId());
+
+            if (goodsEntityOptional.isPresent()) {
+                GoodsEntity goodsEntity = goodsEntityOptional.get();
+                goodsInvoicesToSaveDTO.setGoodsId(goodsService.entityToDTO(goodsEntity).getId());
+                GoodsInvoicesDTO createdDTO = goodsInvoicesService.createGoodsInvoices(goodsInvoicesToSaveDTO);
+                return ResponseEntity.ok(createdDTO);
+            } else {
+                return ResponseEntity.badRequest().body(new GoodsInvoicesDTO()); // Обробити випадок, коли товар не знайдено
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new GoodsInvoicesDTO()); // Обробити помилку
+        }
+    }
+-----------------------------------------------------
+<form onSubmit={handleSubmit}>
+          <label>
+            Номер замовлення:
+            <input
+              type="text"
+              name="number"
+              value={formData.number}
+              onChange={handleChange}
+              required
+            />
+          </label>
+          <br />
+          <label>
+            ID покупця:
+            <input
+              type="text"
+              name="customerId"
+              value={formData.customerId}
+              onChange={handleChange}
+              required
+            />
+          </label>
+          <br />
+          {/* <label>
+            ID типу оплати:
+            <input
+              type="text"
+              name="paymentsTypeId"
+              value={formData.paymentsTypeId}
+              onChange={handleChange}
+              required
+            />
+          </label>
+          <br />
+          <label>
+            ID методу доставки:
+            <input
+              type="text"
+              name="deliveriesMethodId"
+              value={formData.deliveriesMethodId}
+              onChange={handleChange}
+              required
+            />
+          </label>
+          <br />
+          <label>
+            Адреса доставки:
+            <input
+              type="text"
+              name="addressDelivery"
+              value={formData.addressDelivery}
+              onChange={handleChange}
+              required
+            />
+          </label> */}
+          <br />
+          <button type="submit">Створити замовлення</button>
+        </form>
+---------------------
+
+ {products.map(product => (
+        <div key={product.id}>
+          {/* Виводимо id товару для перевірки 
+          {/* <p>ID: {product.id}</p> */}
+          <Link to={`/goods/${product.id}`}>
+            <button className='btn-list'>
+              <h2>{product.name}</h2>
+              {product.photosGoodsDTOS.length > 0 ? (
+                <img src={product.photosGoodsDTOS[0].path} alt={product.photosGoodsDTOS[0].discription} />
+              ) : (
+                <img src="https://images.app.goo.gl/pMxqRJzWJuc8hmws9" alt="Дефолтне фото" />
+              )}
+              {/* <p>{product.short_discription}</p> */}
+
+              {goodsInvoices
+                .filter(invoice => invoice.goods_id === product.id)
+                .map(filteredInvoice => (
+                  <div key={filteredInvoice.id}>
+                    <p>{filteredInvoice.price}</p>
+                    <p>{filteredInvoice.quantity}</p>
+                  </div>
+                ))
+              }
+            </button>
+          </Link>
+        </div>
+      ))}
+	  {/* <p>{product.short_discription}</p> */}
+              
+              {/* {goodsInvoices
+                .filter(invoice => invoice.goods_id === product.id)
+                .map(filteredInvoice => (
+                  <div key={filteredInvoice.id}>
+                    <p>{filteredInvoice.price}</p>
+                    <p>{filteredInvoice.quantity}</p>
+                  </div>
+                ))
+              } */}
+////////////////////////////////////////////////////////////
+01.10.23 виведено кількість з прибутку і ціну з ордера
+////////////////////////////////////////////////////////////
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import '../../global.css';
+import axios from 'axios';
+
+function ProductList() {
+  const [goodsOrders, setGoodsOrders] = useState([]);
+  const [goodsInvoices, setGoodsInvoices] = useState([]);
+
+  useEffect(() => {
+    axios.get('http://localhost:8080/goodsinvoices')
+      .then(response => setGoodsInvoices(response.data))
+      .catch(error => console.log(error));
+
+    axios.get('http://localhost:8080/goodsOrders')
+      .then(response => setGoodsOrders(response.data))
+      .catch(error => console.log(error));
+  }, []);
+
+  if (goodsOrders.length === 0 || !Array.isArray(goodsInvoices)) {
+    return <div>Товарів ще немає</div>;
+  }
+
+  return (
+    <div className="Main">
+      <h1>Список товарів</h1>
+
+      {goodsOrders.map(goodsOrder => {
+        // Знайдемо відповідний goodsInvoice за goodsOrder.id
+        const matchedGoodsInvoice = goodsInvoices.find(goodsInvoice => goodsInvoice.id === goodsOrder.goodsInvoicesDTO.id);
+
+        if (!matchedGoodsInvoice) {
+          // Якщо goodsInvoice не знайдено, пропускаємо цей товар
+          return null;
+        }
+        console.log(matchedGoodsInvoice);
+
+        return (
+          <div key={goodsOrder.id}>
+            <Link to={`/goodsOrders/${goodsOrder.id}`}>
+              <button className='btn-list'>
+                <div className='name-img'>
+                  <h2>{goodsOrder.goodsInvoicesDTO.goods.name}</h2>
+                  {/* {matchedGoodsInvoice.photosGoodsDTOS && matchedGoodsInvoice.photosGoodsDTOS.length > 0 ? (
+                    <img src={matchedGoodsInvoice.photosGoodsDTOS[0].path} alt={matchedGoodsInvoice.photosGoodsDTOS[0].discription} />
+                  ) : ( */}
+                  {matchedGoodsInvoice.photosGoodsDTOS && matchedGoodsInvoice.photosGoodsDTOS.length > 0 ? (
+                    <img src={matchedGoodsInvoice.photosGoodsDTO[0].path} alt={matchedGoodsInvoice.photosGoodsDTO[0].discription} />
+                  ) : (
+                    <img src="https://image-thumbs.shafastatic.net/807950839_310_430" alt="Дефолтне фото" />
+                  )}
+                </div>
+                <div className='price'>
+                  <table>
+                    <tr>
+
+                    {/*ціна з кошика можна зробити прибутокова*певний відсоток(навар) */}
+                      <td><h1>Ціна: </h1></td> <td><h3>{goodsOrder.price}</h3></td>
+                    </tr>
+                    {/*залишок на складі(прихідна накладна) */}
+                    <tr>
+                      <td><h1>Залишок: </h1></td>
+                      <td>
+                        <h3>{matchedGoodsInvoice.quantity}</h3>
+
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </button>
+            </Link>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export default ProductList;
+
+
+////////////////////////////////////////////////////////////
+
+
+Для створення репозиторію в GitLab та копіювання свого проекту з папкою "documentation-site" в нього, слід дотримуватися таких кроків:
+
+Створення репозиторію в GitLab:
+
+Увійдіть до свого облікового запису на GitLab.
+Натисніть кнопку "+ New" у верхньому правому кутку і оберіть "Project".
+Заповніть назву для репозиторію та інші налаштування за потреби.
+Виберіть приватність репозиторію (публічний, внутрішній або приватний).
+Натисніть "Create project".
+Підготовка проекту для завантаження:
+
+Відкрийте командний рядок або термінал на вашому комп'ютері.
+Перейдіть до кореневої папки вашого проекту, де знаходиться папка "documentation-site".
+Ініціалізація Git репозиторію:
+
+Виконайте команду git init, щоб ініціалізувати новий репозиторій у вашому проекті.
+Додавання та збереження змін:
+
+Використовуйте команду git add documentation-site для додавання папки "documentation-site" до зони стеження Git.
+Виконайте команду git commit -m "Initial commit" для збереження змін у віддаленому репозиторії.
+Підключення до віддаленого репозиторію на GitLab:
+
+Скопіюйте URL вашого створеного репозиторію на GitLab.
+Виконайте команду git remote add origin <URL репозиторію> для додавання віддаленого з'єднання до вашого репозиторію.
+Відправлення змін на GitLab:
+
+Виконайте команду git push -u origin master (або іншу назву гілки, якщо ви використовуєте іншу) для відправлення змін на GitLab.
+Це загальний алгоритм, який може змінитися в залежності від конкретних обставин, таких як налаштування вашого середовища, версія Git тощо. Не забудьте замінити <URL репозиторію> на фактичний URL вашого репозиторію на GitLab.
+
+Перед виконанням будь-яких команд, особливо пов'язаних зі змінами в репозиторії, рекомендується ознайомитися з базовими командами Git та структурою GitLab для більшої ефективності та безпеки.
+git init  ініціалізує сховище
+git status 
+git fetch — це команда, яка повідомляє вашому локальному git про останню інформацію метаданих оригіналу (але не передає жодного файлу. 
+Це більше схоже на перевірку того, чи є нові зміни).
+git pull робить це ТА переносить (копіює) ці зміни з віддаленого репозиторію
+////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+
+export default function Comments() {
+    const [comments, setComments] = useState([]);
+    const [posts, setPosts] = useState([]);
+    const [users, setUsers] = useState([]);
+    useEffect(() => {
+        // Симулюємо отримання списку товарів з сервера або API
+        fetch('https://jsonplaceholder.typicode.com/comments')
+            .then(response => response.json())
+            .then(data => setComments(data))
+            .catch(error => console.log(error));
+    }, []);
+    useEffect(() => {
+        // Симулюємо отримання списку товарів з сервера або API
+        fetch('https://jsonplaceholder.typicode.com/posts')
+            .then(response => response.json())
+            .then(data => setPosts(data))
+            .catch(error => console.log(error));
+    }, []);
+    const findPostById = (postId) => {
+        return posts.find(post => post.id === postId);
+    }
+    return (
+        <div className="Main">
+            <div style={{ border: '1px solid black' }}>
+                <table style={{ border: '1px solid black', width: '100%' }}>
+                    <thead style={{ border: '1px solid black' }}>
+                        <tr style={{ background: 'lightgray', border: '1px solid black', textAlign: 'center' }}>
+                            <th colSpan='3'>Post</th>
+                        </tr>
+                    </thead>
+                    <thead >
+                        <tr style={{ background: 'lightgray', padding: '5px', border: '1px solid black' }}>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody style={{ border: '1px solid black',color: 'green' }}>
+                        {comments.map((comment) => {
+                            const post = findPostById(comment.postId); // Знайти користувача за ID коментаря
+                            return (
+                                <tr key={comment.id} style={{  padding: '5px' }} >
+
+                                    <tr style={{ border: '1px solid black',background: 'yellow' }}>
+                                        <td style={{ border: '1px solid black',color: 'blue' }} colSpan='3'>{comment.postId} | {post ? post.title : 'post not found'}
+                                     {post ? post.body : 'post not found'}</td>
+                                        {/* <td style={{ border: '1px solid black',color: 'blue' }}>{comment.postId} </td>
+                                        <td style={{ border: '1px solid black',color: 'blue' }}>{post ? post.title : 'post not found'}</td>
+                                        <td style={{ border: '1px solid black',color: 'blue' }}>{post ? post.body : 'post not found'}</td> */}
+                                    </tr>
+                                    <tr style={{ background: 'orange' }}>
+                                        <td style={{ border: '1px solid purple' }}>{comment.id}</td>
+                                        <td>{comment.name}</td>
+                                        <td>{comment.email}</td>
+
+                                    </tr>
+                                </tr>
+                            );
+                        })}
+                        </tbody> 
+                    {/* </tbody>
+                    <tbody style={{ padding: '5px' }}>
+                        {comments.map((comment) => (
+                            <tr key={comment.id} style={{ border: '1px solid black', padding: '5px' }}>
+                                <td>{comment.id}</td>
+                                <td>{comment.name}</td>
+                                <td>{comment.email}</td>
+
+                            </tr>
+                        ))}
+                        {/* {comments.map((comment)=>(
+                        <tr key={comment.id} style={{border: '1px solid black',padding: '5px' }}> 
+                            <td>{comment.id}</td>
+                            <td>{comment.name}</td>
+                            <td>{comment.email}</td>
+                            
+                        </tr>
+                        ))} */}
+                    
+                    {/* </tbody>  */}
+                </table>
+
+            </div>
+        </div>
+
+    );
+}
+
+
+
+мобільний телефон та імейл
+@"^[\d\w\._\-]+@([\d\w\._\-]+\.)+[\w]+$"
+@"^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]{2,4}[-\s\./0-9]*$"
+------------------------------------------------------
+..///index.js 2 УРОК 
+------------------------------------------------------
+/*function second(){
+  return root.render(
+      <div>
+        <p>I's </p>
+        <h2>{new Date().toLocaleTimeString()}</h2>
+        <p>Line</p>
+        <button onClick={second}>Update</button>
+      </div>
+      
+    );
+}
+setInterval(second,1000)*/
+------------------------------------------------------
+..//App.js
+------------------------------------------------------
+import logo from './logo.svg';
+import './App.css';
+import React from 'react';
+function App() {
+  function test(){
+    console.log("App work!");
+    return "My name is React!";
+  }
+  return (
+    <><h1>
+      Домашку зроби!))))
+    </h1>
+    {/* */}
+    {100+183}
+    <p>{test()}</p>
+    <button onClick={test}>Нажми мене</button>
+    </>
+    
+  );
+}
+---------------------------------------------------------------
+function App() {
+  const students = [
+    { name: "Іван", Surname: "Степанів", phone: "0649646846" },
+    { name: "Степан", Surname: "Василів", phone: "0649646846" },
+    { name: "Пилип", Surname: "Петровів", phone: "0649646423" },
+    { name: "Петро", Surname: "Павловів", phone: "0632546846" },
+    { name: "Василь", Surname: "Пилипів", phone: "0636781146" },
+    { name: "Йосип", Surname: "Такий", phone: "0649646846" },
+    { name: "Валерій", Surname: "Сякий", phone: "0649646846" }
+  ]
+  return (
+    <>
+      {students.map((e) => {
+        return(
+        <>
+          <h2>{e.name} </h2>
+          <h2>{e.Surname} </h2>
+          <h2>{e.phone} </h2>
+        </>)
+    })
+      }
+    </>
+
+  );
+}
+---------------------------------------------------------------
+import logo from './logo.svg';
+import './App.css';
+import React from 'react';
+function App() {
+  const students = [
+    { name: "Іван", Surname: "Степанів", phone: "0649646846" },
+    { name: "Степан", Surname: "Василів", phone: "0649646846" },
+    { name: "Пилип", Surname: "Петровів", phone: "0649646423" },
+    { name: "Петро", Surname: "Павловів", phone: "0632546846" },
+    { name: "Василь", Surname: "Пилипів", phone: "0636781146" },
+    { name: "Йосип", Surname: "Такий", phone: "0649646846" },
+    { name: "Валерій", Surname: "Сякий", phone: "0649646846" }
+  ]
+  return (
+    <ul>
+      {students.map((e,ind) => <li key={ind}>{e.name} {e.Surname} {e.phone}</li>)}
+    </ul>
+
+  );
+}
+
+export default App;
+
+---------------------------------------------------------------
+<p style={{color:'red',fontStyle:'italic'}}>       2 УРОК 31:00 ХВ
+------------------------------------------------------------------------------------------------------------------------------
+ const myStyle={
+'fontWeigth':'bold',
+'color':'green',
+'textTransform':'uppercase'
+};
+return (
+    <>
+    <p style={myStyle}>
+      lorem hkuhbk;bjvbkbkbk.bkb k,jbkhb,mbh mhb,m ,jm ,jmhb khm jhm
+    </p>
+    </>
+
+  );
+---------------------------------------------------------------
+function App() {
+ const myStyle={
+'fontWeigth':'bold',
+'color':'green',
+'textTransform':'uppercase'
+};
+const styles='green-text';
+  return (
+    <>
+    <p className={styles}>
+      lorem hkuhbk;bjvbkbkbk.bkb k,jbkhb,mbh mhb,m ,jm ,jmhb khm jhm
+    </p>
+    </>
+
+  );
+}
+---------------------------------------------------------------
+let x=1;
+  return (
+    <>
+    {x===0 &&(<h1>Hello Everyone!</h1>)}
+    </>
+
+  );
+---------------------------------------------------------------
+let head1=<h1>Hello Every</h1>
+  return (
+    <>
+    <div>
+    {head1}
+
+    </div>
+    </>
+
+  );
+---------------------------------------------------------------
+return (
+    <>
+    <forms action='' >
+      <label>HTML</label>
+      <br/>
+      <input type='submit' value='submit'/>
+    </forms>
+    </>
+
+  );
+---------------------------------------------------------------
+const htmlString='<h1>Hello Everyone!</h1>';
+  return (
+    <>
+    <ul>
+      <li>{htmlString}</li>
+      <li dangerouslySetInnerHTML={{__html:htmlString}}></li>
+    </ul>
+    </>
+
+  );
+---------------------------------------------------------------
+const htmlString='<h1>Hello Everyone!</h1>';
+ return (
+    <>
+    <input type='text' readOnly/> 
+    {/* краще перший варіант */}
+    <input type='text' readOnly={true}/>
+    </>
+
+  );
+---------------------------------------------------------------
+const el1=React.createElement('h1',{'id':123,
+'style':
+{'color':'green',
+ 'fontsize':24,
+ 'background':'brown'
+}
+},'some text');
+
+  return (
+    <>
+   {el1}
+   <h1 id={123} style={{'fontsize':40,'color':'green', 'background':'brown'}}>some text</h1>
+    </>
+
+  );
+---------------------------------------------------------------
+const parag=React.createElement('p',{},'ewrgthyjkmnbsdfghjkjhgd');
+const block=React.createElement('div',{},parag);
+  return (
+    <>
+   {el1}
+   <h1 id={123} style={{'fontsize':40,'color':'green', 'background':'brown'}}>some text</h1>
+   {block}
+    </>
+---------------------------------------------------------------
+
+ВІДЕОУРОК № 3. Основи роботи з React компонентами
+
+---------------------------------------------------------------
+\\Test.js
+import React from 'react';
+class Test extends React.Component{
+render(){
+    return (
+        <>
+       <h1 >3 урок</h1>
+      <p>oibherbukher ehjrukbsuehkthusbuk</p>
+      </>
+    
+      );
+     }
+}
+export default Test;
+\\\index.js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+import Test from './Test';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+root.render(
+  <>
+  <App/>
+  <Test/>
+  </>
+---------------------------------------------------------------
+function Parent(props){
+    console.log(props.ForX);
+    return (
+        <>
+        <p>My name is {props.data.name}</p>
+        </>
+        )
+}
+export default Parent;
+---------------------------------------------------------------
+16:52
+17:42 створюємо файли у папках Header,Footer,Main,Sidebar і наповнюємо функціями (пустими)
+23:42 створюємо файл global.css
+33:40 компонент main,пропис Articles.js
+38:15 компонент Footer
+40:15 додає ще одну статтю
+41:17 стилі для Main
+43:20 підсумок уроку
+43:52 задача  передача даних з дочірнього в батьківський
+48:18 нагадування про практичну роботу
+49:03
+---------------------------------------------------------------
+
+№4
+Управління станами функціональних компонентів. Введення в хуки
+
+00:00 Що розглянемо в межах уроку,що таке хуки
+03:40 Які хуки існують 
+04:35 Правила використання хуків 
+05:25 Вбудовані в react хуки,що таке хук стану useState
+06:16 VS Code створює проект,переходить в директорію і запускає,видаляє лишнє з проекту
+08:34 для першого прикладу створює у App.js функцію increase() яка змінює x по кнопці
+10:40 імпортуємо хук useState,робить все через хук - збільшуємо на 1 змінну(counter)
+14:24 що потрібно класти всередину State - це що впливає на інтерфейс
+15:10 фунція decrease і кнопка,тестує
+16:44 якщо counter не змінювати
+18:21 як ще переконатися що значення не змінюється,компонент Profiler
+20:00 ускладнює приклад добавляє колір в increase та decrease
+22:30 ще приклад створюємо input range функція valSetter()
+23:44 що таке event,як його використати
+26:37 як працювати з масивами функція const push
+31:40 що можна з цим зробити - як використати з масивом
+35:12 створюємо список <li> виводить масив,хук подбає про перерисовку,а ми маємо правильно використати
+36:36 підсумки уроку,нагадування про практику
+49:03
+---------------------------------------------------------------
+import { useState } from "react";
+
+function App() {
+  const[counter,setCounter]=useState(0);
+  const[pColor,setPcolor]=useState({background:'white'});
+  function increase(){
+    setCounter(counter+1);
+    setPcolor({background:'green'})
+  // x=x+1;
+  // console.log(x);
+  }
+  function decrease(){
+    setCounter(2);
+    setPcolor({background:'red'})
+  // x=x+1;
+  // console.log(x);
+  }
+  return (
+    <>
+    <h1>{counter}</h1>
+    <p style={pColor}>lorem yh5eyh ae5hth</p>
+    <button onClick={increase}>increase +</button>
+    <button onClick={decrease}>Decrease -</button>
+    </>
+  );
+}
+---------------------------------------------------------------
+import { useState } from "react";
+
+function App() {
+  const [val,setVal]=useState(0);
+  function valSetter(event){
+    //console.log(event.target.value);
+    setVal(event.target.value);
+  }
+  
+  return (
+    <>
+    <h3>{val}</h3>
+    <input type="range" onChange={valSetter} value={val}></input>
+    </>
+  );
+}
+
+export default App;
+---------------------------------------------------------------
+function App() {
+  const [arr,setArr]=useState([1,2,3,4,5]);
+  const push=()=>{
+  //console.log("ljyigku")
+  //let temp=[...arr];//копіюємо повністю масив
+  let temp=arr;//посилання на масив
+  temp.push(1);
+  //console.log(temp);
+ setArr(temp);
+}
+---------------------------------------------------------------
+№5 Управління ефектами компонентів. Можливості методу useEffect
+---------------------------------------------------------------
+00:00 Що розглянемо в межах уроку,про DOM-елементи,хук useRef
+02:25 показує приклад на попередньому проекті пояснює DOM-елементи
+04:00 підключає useRef та пише код з кнопкоми,подією і хуком useRef
+10:30 що розміщено всередині цього тегу
+11:00 розширимо приклад додаємо input 
+12:40 показує приклад з Checkbox
+14:37 як не варто працювати з DOM-елементи
+16:33 додаткова інформації про useRef
+18:02 у VS Code показує рендер функціональних компонентів при створенні,їх порядковість
+21:46 у VS Code показує рендер функціональних компонентів при зміні стейту
+25:25 рендер не перемальовує а порівнює з віртуальним деревом
+27:03 рендер функціональних компонентів при спрацюванні рендеру батьківського елементу,Helper.js
+30:17 в Helper.js створює useState, рендер батьківського не впливає на дочірній при використанні стейту
+33:49 в презентації хук-метод useEffect змінює App.js
+36:17 створює ще один useState, показує як працює useEffect
+38:05 залежності до данного хуку
+39:51 useEffect-ів може бути декілька у компонентів
+41:03 якщо передати пустий масив
+42:15 значення з бекенду,сервіс надання тестових API https://jsonplaceholder.typicode.com/ на прикладі users
+42:15 підключення та відображення users
+45:50 потрібно знати декілька прийомів
+46:28 що сьогодні вивчили, практика
+47:27
+{
+---------------------------------------------------------------
+import {useRef} from 'react';
+function App() {
+  const but1=useRef();
+  const but2=useRef();
+
+  function buttonListener(event){
+    //console.log(event.target);
+     console.log(but1.current.innerHTML);
+   //but1.current.style.background="red";
+  }
+  return (
+    <>
+    <div className="App">
+      <button ref={but1} onClick={buttonListener}>Push</button>
+      <br></br>
+      <button ref={but2} onClick={buttonListener}>abc</button>
+    </div>
+    </>
+  );
+}
+
+---------------------------------------------------------------
+import {useRef} from 'react';
+function App() {
+  const but1=useRef();
+  const inp1=useRef();
+  const check1=useRef();
+
+  function buttonListener(event){
+    //console.log(event.target);
+    but1.current.style.background="red";
+    console.log(inp1.current.value);//для відображення того що ввів користувач
+  }
+  return (
+    <>
+    <div className="App">
+      <input ref={inp1} type='text'/>
+      <button ref={but1} onClick={buttonListener}>Push</button>
+    </div>
+    </>
+  );
+}
+---------------------------------------------------------------
+function buttonListener(event){
+    console.log(check1.current.checked);//для відображення того що ввів користувач
+    check1.current.checked=true;
+  }
+  return (
+    <>
+    <div className="App">
+      <input ref={check1} type='checkbox'/>
+      <button ref={but1} onClick={buttonListener}>Push</button>
+    </div>
+    </>
+  );
+---------------------------------------------------------------
+import {useRef} from 'react';
+function App() {
+  const but1=useRef();
+  const check1=useRef();
+
+  function buttonListener(){
+    let inp=document.getElementById('first');
+    console.log(check1.current);//для відображення того що ввів користувач
+  }
+  return (
+    <>
+    <div className="App">
+      <input id='first' className='checkbox1' ref={check1} type='checkbox'/>
+      <button ref={but1} onClick={buttonListener}>Push</button>
+    </div>
+    </>
+  );
+}
+
+export default App;
+---------------------------------------------------------------
+import {useRef} from 'react';
+import {useState} from 'react';
+import Helper from './Helper';
+
+function App() {
+  const [mystate,setMystate]=useState(1);
+function change(){
+  setMystate(mystate+10);
+}
+
+  return (
+    <div className='App'>{console.log('render component App')}
+    
+    <p>My state is {mystate}</p>
+    <p>lrjbkdbdj</p>
+    <button onClick={change}>Change</button>
+    <Helper/>
+    </div>
+  );
+}
+
+export default App;
+export default App;
+---------------------------------------------------------------
+import {useRef} from 'react';
+//import {useState} from 'react';
+import {useState,useEffect} from 'react';
+//import Helper from './Helper';
+
+function App() {
+  const [mystate,setMystate]=useState(1);
+  const [secondState,setsecondState]=useState(-100);
+
+function change(){
+  setMystate(mystate+10);
+}
+function changeSecond(){
+  setsecondState(secondState-100);
+}
+useEffect(()=>{
+  console.log('Effect working');
+},[mystate])
+  return (
+    <div className='App'>{console.log('render component App')}
+    
+    <p>My state is {mystate}</p>
+    <p>lrjbkdbdj</p>
+    <p>Second state is {secondState}</p>
+    <button onClick={change}>Change STATE</button>
+    <button onClick={changeSecond}>Change SECOND STATE</button>
+    {/* <Helper/> */}
+    </div>
+  );
+}
+
+export default App;
+
+---------------------------------------------------------------
+import {useRef} from 'react';
+//import {useState} from 'react';
+import {useState,useEffect} from 'react';
+//import Helper from './Helper';
+
+function App() {
+  const [mystate,setMystate]=useState(1);
+  const [secondState,setsecondState]=useState(-100);
+  const [usersState,setUsers]=useState([]);
+
+function change(){
+  setMystate(mystate+10);
+}
+function changeSecond(){
+  setsecondState(secondState-100);
+}
+useEffect(()=>{
+  //console.log('Effect working');
+  fetch('https://jsonplaceholder.typicode.com/users')
+      .then(response => response.json())
+      .then(json => setUsers(json))
+},[])
+
+// useEffect(()=>{
+//   console.log('Effect Second State');
+// },[secondState])
+
+  return (
+    <div className='App'>
+    {/* {console.log('render component App')} */}
+    
+    <p>My state is {mystate}</p>
+    <p>lrjbkdbdj</p>
+    <p>Second state is {secondState}</p>
+    <button onClick={change}>Change STATE</button>
+    <button onClick={changeSecond}>Change SECOND STATE</button>
+    {/* <Helper/> */}
+    <ul>
+      {usersState.map(e=><li key={e.id}>{e.name}</li>)}
+    </ul>
+    </div>
+  );
+}
+}
+---------------------------------------------------------------
+№6 Розробка застосунку для списку нотатків
+---------------------------------------------------------------
+00:00 
+
+58:39
+---------------------------------------------------------------
+---------------------------------------------------------------
+
+
+
+
+
+
+
+00:00 привітання
+01:45 про що сьогодні розповідатиметься,програма тренінгу
+06:09 створює папку, яка буде проектом,про snackCase
+07:35 у PyCharm відкриває проект,створює папку в консолі як зручніше 
+09:20 про відволікання на коментарі у минулому відео,відкриває термінал PyCharm
+10:50 git init,git status,створює файл example.py,наповнює його кодом для прикладу
+12:32 git add, git status,додає до коміту файл example.py,git commit -m(без редактора Win) з коментарем
+13:52 файли які потрібно ігнорувати під час коміту (secret.txt), створює файл .gitignore 
+15:15 про автоматизовані IDE і чому це під час навчання погано
+16:25 про вміст файлу .gitignore, формує на ресурсі https://www.toptal.com/developers/gitignore
+19:12 після додавання git status,переглядає чат,відповідає
+20:40 у VS Code показує термінал,де знайти автоматичне створення файлів шаблонів,проблеми які виникають в чаті
+22:30 створює файл example2.py і робить ще один коміт, git add .  - коміт усіх файлів проекту
+27:30 реклама курси CyberBionic Systematics,лайки
+29:00 про розподілений контроль версій,про що це, історія розробки 
+32:10 чому саме GITLAB,яка різниця між СКВ(VCS)
+35:05 ставлять + в кого є gitlab
+36:24 як реєструватися в GITLAB, розповідає як,пропонує закінчити реєстрацію самотужки
+39:40 що побачимо після реєстрації в GITLAB
+40:25 створення пустого проекту в GITLAB,про важливість Readme-файлу
+44:20 про SSH-ключі,де знайти
+46:50 як клонувати проект
+47:20 створює новий проект,клонує репозиторій до цього проекту
+51:00 створює папку в завантаженнях в яку клонується репозиторій GITLAB через виклику терміналу в цій папці(git clone посилання на репозиторій)
+53:04 показує презентацію створення локального репозиторію, обов'язково гугліть якщо є невеликі питання
+55:20 як пов'язати локальний репозиторій з віддаленим в GITLAB
+55:40 яка основна задача розробника
+56:50 дві сторони: коли самостійно створили репозиторій(автор) і коли ви маєте доступ до репозиторію
+58:20 присилають нік в GITLAB,підключає членів,про ролі в GITLAB
+01:02:20 пряме питання в гугл про SSH-ключі
+01:02:55 не власник репозиторію
+01:04:28 як скачати собі код з репозиторію
+01:05:50 перейшли в репозиторій який створювали,увага на Readme.md(mark down),описання важливо
+01:08:30 git status видав помилку не цю папку відкрив
+01:10:45 ніколи не пишуть в головній гілці,git pull для синхронізації
+01:11:40 питання користувача,в якого помилка пов'язана з правами Windows
+01:12:11 як вести розробку,що далі розповідатиметься
+01:12:56 презентація git: як команда спільно працює над кодом
+01:15:28 git checkout -b перемикає на нову гілку "pretty_print"
+01:16:11 cтворює файл my_code.py в новій гілці "pretty_print" і наповнює кодом(Python),тестує код
+01:18:34 додає .gitignore в нову гілку ("pretty_print")
+01:20:00 додає в нову гілку ("pretty_print") коміт "git . " і дає йому назву (git commit -m [назва доданого коміту])
+01:21:30 відправляє код на віддалений репозиторій git push origin pretty_print, помилка (дефіс замість підкреслення)
+01:25:00 перегляд віддаленого репозиторію про merge request і його створення
+01:30:20 повертається в PyCharm змінює код файлу my_code.py
+01:32:00 в GITLAB:approved,merge і одночасне видалення гілки
+01:33:10 змінив код,але видалив гілку(через approved+merge)
+01:33:55 забув закомітити, додає в коміт, комітить і відправляє на віддалений ропозиторій(push origin назва гілки)
+01:36:10 все відправив,approved,створює повторно merge request
+01:38:25 розповідає про підхід розробки CI\CD
+01:43:50 підхід комбінованої розробки GIT-trunk
+01:46:38 презентацію викладуть в чат
+01:47:10 на практиці кожна команда працює по своїй системі, яка відрізняється від теорії
+01:48:14 правило для студентів - якщо за 2 години не вирішуєш питання з гуглом, питаєш в інших,про матеріали
+01:50:17 різниця між CI та CD
+01:51:04 рекомендації студентам, не стидайтеся показувати свій код іншим,спілкування в code rewiew,Readme-файл
+01:54:12 відповіді на питання: вирішення конфлікту у GITLAB зміни файлу 2 особами
+01:55:46 як у себе видаляти гілку git branch(інфа про локальні гілки),git checkout назва гілки(зміна на іншу),git pull(оновлює основну гілку),git branch -D назва гілки(видалення гілки)
+01:57:52 питання про видалення історії комітів 
+01:58:20 про різницю commit і rebase 
+02:00:32 про курс Python,до побачення
+
+
+
+
+
+
+ Навчальний процес, а саме порядок дисциплін, був реалізований не виходячи з вивченого, а з наявності вільного часу у вчителів чи наявність самих вчителів, наприклад: Розробка програмних проектів(потрібно на рік пізніше),програмування Android(потрібно після вивчення JAVA);
+Відсутність рекомендацій до запропонованих навчальною частиною тем дипломних проектів, саме до групових дипломних робіт
+Харламенко Вадим
+Левківський Віталій
+Знаходити час(хоч трішки) на допомогу студентам поза заняттям
+під час звернення по розкладу занять, змінено було після завершення самих занять
+Допомогти працевлаштуватися: вакансії, пропозиції
+Раніше були проблеми з входом,ймовірно через куки, зараз поки все нормально)!
+Щось на зразок семінару для успішної,впевненої співбесіди
+Python,CMS(щось з Drupal,WordPress,Joomla,Prestashop,Shopify,OpenCart,SiMan), Docker,окремо про Git
+ 
+ 
+ 
+ 
+ 
+ out.println("<body>");
+                out.println("<h1>Редагування блокнота</h1>");
+                out.println("<form class=\"row gy-2 gx-3 align-items-center\" action=\"UpdateServlet\" method=\"post\">");
+                out.println("<div class=\"col-auto\">");
+                out.println("<input type=\"hidden\" name=\"id\" id=\"id\" value=\"" + id + "\"><br>");
+                out.println("<label class=\"input-group-text\" for=\"Manufacturer\" >Назва виробника</label>");
+                out.println("<input type=\"text\" name=\"Manufacturer\" class=\"form-control\" value=\"" + Manufacturer + "\" id=\"Manufacturer\" placeholder=\"Manufacturer\"><br>");
+                out.println("<label class=\"input-group-text\" for=\"NameBloknot\" >Назва блокноту</label>");
+                out.println("<input type=\"text\" name=\"NameBloknot\" class=\"form-control\" id=\"NameBloknot\" value=\"" + NameBloknot + "\" placeholder=\"NameBloknot\"><br>");
+                out.println("<label class=\"input-group-text\" for=\"countPages\" >Кількість сторінок</label>");
+                out.println("<input type=\"number\" name=\"countPages\" class=\"form-control\" id=\"countPages\" value=\"" + countPages + "\" placeholder=\"countPages\"><br>");
+                out.println("<label class=\"input-group-text\" for=\"coverType\">Тип обкладинки</label>");
+                out.println("<input type=\"text\" name=\"coverType\" class=\"form-control\" id=\"coverType\" value=\"" + coverType + "\" placeholder=\"coverType\"><br>");
+                out.println("<label class=\"input-group-text\" for=\"country\">Назва країни</label>");
+                out.println("<input type=\"text\" name=\"country\" class=\"form-control\" id=\"country\" value=\"" + country + "\" placeholder=\"country\"><br>");
+                out.println("<label class=\"input-group-text\" for=\"Appearance\">Зовнішній вигляд:<label>");
+                out.println("<input type=\"text\" name=\"Appearance\" class=\"form-control\" id=\"Appearance\" value=\"" + Appearance + "\" placeholder=\"Appearance\"><br>");
+                out.println("<input type=\"submit\" value=\"Зберегти зміни\">");
+                out.println("</form>");
+
+	
+	
+	
+	
+	
+	
+	
+	
+	 //if(проходить валідацію){
+ //}
+        // else{
+        //     
+        //     return redirect('/userlist.store',compact('помилка щось неправильно');
+        // }
+
+АЛГОРИТМ З PHP CODEIGNITER:
+1)створити форми(реєстрація,вхід,головна - 2 кнопки)
+2)контроллери до форм
+	
+	
+	

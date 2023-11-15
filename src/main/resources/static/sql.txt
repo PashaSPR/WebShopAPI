@@ -1,0 +1,246 @@
+
+	
+	INSERT INTO public.rolesusers (name)
+VALUES
+    ('admin'),
+    ('seller'),
+    ('buyer'),
+    (NULL)
+;
+INSERT INTO public.userslists (nickname, password, roles_users_id)
+VALUES
+    ('user1', 'password1', 1),
+    ('user2', 'password2', 2),
+    ('user3', 'password3', 3),
+    ('user4', 'password4', 4),
+    ('user5', 'password5', 1),
+    ('user6', 'password6', 2),
+    ('user7', 'password7', 3),
+    ('user8', 'password8', 4),
+    ('user9', 'password9', 1),
+    ('user10', 'password10', 2)
+;
+INSERT INTO public.customers (address, email, name, phone, users_lists_id)
+VALUES
+	('Address 1', 'email1@example.com', 'Іван Петрович', '123-456-7890', 1),
+    ('Address 2', 'email2@example.com', 'Марія Сергіївна', '987-654-3210', 2),
+    ('Address 3', 'email3@example.com', 'Олександр Васильович', '111-222-3333', 3),
+    ('Address 4', 'email4@example.com', 'Наталія Анатоліївна', '444-555-6666', 4),
+    ('Address 5', 'email5@example.com', 'Ігор Юрійович', '777-888-9999', 5),
+    ('Адреса 6', 'email6@example.com', 'Оксана Андріївна', '555-555-5555', 6),
+    ('Адреса 7', 'email7@example.com', 'Володимир Вікторович', '666-666-6666', 7),
+    ('Адреса 8', 'email8@example.com', 'Людмила Михайлівна', '777-777-7777', 8),
+    ('Адреса 9', 'email9@example.com', 'Петро Петрович', '888-888-8888', 9),
+    ('Адреса 10', 'email10@example.com', 'Галина Сергіївна', '999-999-9999', 10)
+;
+INSERT INTO public.sellers (address, email, name, phone, users_lists_id)
+VALUES
+    ('Address 1', 'email1@example.com', 'Seller 1', '123-456-7890', 1),
+    ('Address 2', 'email2@example.com', 'Seller 2', '987-654-3210', 2),
+    ('Address 3', 'email3@example.com', 'Seller 3', '111-222-3333', 3),
+    ('Address 4', 'email4@example.com', 'Seller 4', '444-555-6666', 4),
+    ('Address 5', 'email5@example.com', 'Seller 5', '777-888-9999', 5),
+    ('Address 6', 'email6@example.com', 'Seller 6', '555-555-5555', 6),
+    ('Address 7', 'email7@example.com', 'Seller 7', '666-666-6666', 7),
+    ('Address 8', 'email8@example.com', 'Seller 8', '777-777-7777', 8),
+    ('Address 9', 'email9@example.com', 'Seller 9', '888-888-8888', 9),
+    ('Address 10', 'email10@example.com', 'Seller 10', '999-999-9999', 10)
+;
+
+INSERT INTO public.invoiceslists (date, "number", sellers_id)
+VALUES
+    ('2023-09-27', 'INV-004', 1),
+    ('2023-09-28', 'INV-005', 2),
+    ('2023-09-29', 'INV-006', 3),
+    ('2023-09-30', 'INV-007', 4),
+    ('2023-10-01', 'INV-008', 5)
+;
+
+INSERT INTO public.categoriesgoods (name)
+VALUES
+    ('Category 1'),
+    ('Category 2'),
+    ('Category 3'),
+    ('Category 4'),
+    ('Category 5'),
+    ('Category 6'),
+    ('Category 7'),
+    ('Category 8'),
+    ('Category 9'),
+    ('Category 10');
+
+	INSERT INTO public.subcategoriesgoods (name, categories_goods_id)
+VALUES
+    ('Subcategory 1', 1),
+    ('Subcategory 2', 1),
+    ('Subcategory 3', 2),
+    ('Subcategory 4', 2),
+    ('Subcategory 5', 3),
+    ('Subcategory 6', 3),
+    ('Subcategory 7', 4),
+    ('Subcategory 8', 4),
+    ('Subcategory 9', 5),
+    ('Subcategory 10', 5);
+	
+INSERT INTO public.goods (name, short_discription, subcategories_goods_id)
+VALUES
+    ('Product 1', 'Description 1',  1),
+    ('Product 2', 'Description 2', 1),
+    ('Product 3', 'Description 3', 2),
+    ('Product 4', 'Description 4', 2),
+    ('Product 5', 'Description 5', 3),
+    ('Product 6', 'Description 6', 3),
+    ('Product 7', 'Description 7', 4),
+    ('Product 8', 'Description 8', 4),
+    ('Product 9', 'Description 9',  5),
+    ('Product 10', 'Description 10', 5);
+
+
+INSERT INTO public.goodsinvoices (price, quantity, goods_id, sellers_id)
+VALUES
+    (10.99, 5, 1, 1),
+    (15.50, 13, 2, 2),
+    (68.75, 10, 3, 3),
+    (85.75, 15, 4, 4),
+    (730.05, 20, 5, 5),
+    (4430.05, 20, 6, 6),
+    (4530.05, 20, 7, 7),
+    (310.05, 210, 8, 8),
+    (130.05, 120, 9, 9),
+    (1310.05, 320, 10, 10);
+    
+
+
+INSERT INTO public.goodsorders (price, quantity, goods_invoices_id)
+VALUES
+    (110.99, 5, 1),
+    (515.50, 3, 2),
+    (58.75, 10, 3),
+    (312.25, 8, 4),
+    (819.99, 6, 5),
+    (719.99, 6, 6),
+    (8792.99, 6, 7),
+    (4892.99, 6, 8),
+    (4892.99, 6, 9),
+    (1589.99, 6, 10);
+;
+INSERT INTO public.photosgoods (description, path, goods_id)
+VALUES
+    ('Description 1', 'good 1.jpg', 1),
+    ('Description 2', 'good 2.jpg', 2),
+    ('Description 3', 'good 3.jpg', 3),
+    ('Description 4', 'good 4.jpg', 4),
+    ('Description 5', 'good 5.jpg', 5),
+    ('Description 6', 'good 6.jpg', 6),
+    ('Description 7', 'good 7.jpg', 7),
+    ('Description 8', 'good 8.jpg', 8),
+    ('Description 9', 'good 9.jpg', 9),
+    ('Description 10', 'good 10.jpg', 10)
+;
+
+
+-----------------
+INSERT INTO public.orderslists (address_delivery, "number", customers_id, deliveries_method_id, payments_type_id)
+VALUES
+    ('Address 1', 'ORD-001', 1, 1, 1),
+    ('Address 2', 'ORD-002', 2, 2, 2),
+    ('Address 3', 'ORD-003', 3, 1, 2),
+    ('Address 4', 'ORD-004', 4, 2, 1),
+    ('Address 5', 'ORD-005', 5, 1, 1)
+;
+
+
+
+<div className='name-img'>
+                <h2>{goodsOrder.goodsInvoicesDTO.goods.name}</h2>
+                {goodsOrder.goodsInvoicesDTO.goods.photosGoodsDTOS.length > 0 ? (
+                  <img src={goodsOrder.goodsInvoicesDTO.goods.photosGoodsDTOS[0].path} alt={goodsOrder.goodsInvoicesDTO.goods.photosGoodsDTOS[0].discription} />
+                ) : (
+                  <img src="https://images.app.goo.gl/pMxqRJzWJuc8hmws9" alt="Дефолтне фото" />
+                )}
+              </div>
+			  
+			  
+			   {/* value={goodsOrder.quantity} */}
+                                            {/* <p type='text'  readOnly >{goodsOrder.price}</p> */}
+                                            {/* <input type='text' id='number' value={Math.floor(goodsOrder.price*goodsOrder.quantity*100)/100} readOnly />
+                                             <input
+                                                type='number'
+                                                id='number'
+                                                min={1}
+                                                size='50'
+                                                value={quantity}
+                                                onChange={(e) => setQuantity(e.target.value)}
+                                            />
+                                            <input
+                                            type='text'
+                                            id='number'
+                                            value={goodsOrder ? Math.floor(goodsOrder.price * quantity * 100) / 100 : 0}
+                                            readOnly
+                                        />  */}
+										
+										
+										
+										
+										
+										
+										
+										в мене є таблиця замовлення OrdersListsEntity:
+@Entity
+@Table(name = "orderslists")
+public class OrdersListsEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // Унікальний ідентифікатор Замовлення на Товари
+    private String number; //Номер Замовлення на Товари
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "customers_id", referencedColumnName = "id")
+    // Зв'язок Many-to-One: Багато Замовлень на Товари може стосуватися одного Продавця
+    private CustomersEntity customers;
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "paymentsType_id", referencedColumnName = "id")
+    // Зв'язок One-to-One: Багато Замовлень на Товари відповідає одному Типу оплати за товар
+    private PaymentsTypeEntity paymentsType;
+
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "deliveriesMethod_id", referencedColumnName = "id")
+    // Зв'язок One-to-One: Багато Замовлень на Товари відповідає одному Методу доставлення товару
+    private DeliveriesMethodEntity deliveriesMethod;
+    private String address_delivery;  // Адреса доставлення товару
+
+    /////////сутності що мають відношення One-to-Many з сутністю OrdersLists
+    @OneToMany(mappedBy = "ordersLists")
+    @JsonManagedReference
+    // Зв'язок One-to-Many: Одне Замовлення на Товари може мати багато Переліків Товарів
+    private List<GoodsOrdersEntity> goodsOrders = new ArrayList<>();} та таблиця з переліком товарів GoodsOrdersEntity,потрібно при додаванні id товару в GoodsOrdersEntity:
+@Entity
+@Table(name = "goodsorders")
+public class GoodsOrdersEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // Унікальний ідентифікатор Переліку товару в замовлені
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "ordersLists_id", referencedColumnName = "id")
+    // Зв'язок Many-to-One: Багато Переліків товару може стосуватися одного Замовлення покупця
+    private OrdersListsEntity ordersLists;
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "goodsInvoices_id", referencedColumnName = "id")
+    // Зв'язок Many-to-One: Багато Переліків товару може належати одному Товар з Магазину
+    private GoodsInvoicesEntity goodsInvoices;
+
+    private Float price;
+    private Integer quantity;
+}
+перевіряти чи є запис в таблиці OrdersLists з id customers з порожнім(null) записом number, якщо є то додавати в GoodsOrders запис з id запис у таблиці OrdersLists.
+якщо немає то створити запис в OrdersLists і в GoodsOrders додавти записи з id створеного OrdersLists
+
+
+
+
+<!--    ендпоінти будуть відловлюватися цим фільтром-->
+

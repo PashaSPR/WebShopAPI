@@ -66,6 +66,7 @@ package com.example.webshopdip.controllers;
 
 import com.example.webshopdip.dtos.*;
 import com.example.webshopdip.entities.*;
+import com.example.webshopdip.exceptions.GoodsOrdersNotFoundException;
 import com.example.webshopdip.repositories.*;
 import com.example.webshopdip.services.GoodsInvoicesService;
 import com.example.webshopdip.services.GoodsOrdersService;
@@ -76,12 +77,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.*;
 
 import javax.persistence.Convert;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -141,14 +140,14 @@ public class GoodsOrdersController {
             return ResponseEntity.badRequest().body(new GoodsOrdersDTO()); // Обробити помилку
         }
     }
-    @PostMapping("/addToCart")
-    public ResponseEntity<GoodsOrdersDTO> addToCart(@RequestBody GoodsOrdersToSaveDTO goodsOrdersToSaveDTO){
-//чи є в OrdersLists запис де поле Number пусте, а поле customerId==id покупця
-//        якщо є такий запис то ordersListsId(Postman)= id цього запису
-// якщо немає то створюємо запис
-
-        return createGoodsOrders(goodsOrdersToSaveDTO);
-    }
+//    @PostMapping("/addToCart")
+//    public ResponseEntity<GoodsOrdersDTO> addToCart(@RequestBody GoodsOrdersToSaveDTO goodsOrdersToSaveDTO){
+////чи є в OrdersLists запис де поле Number пусте, а поле customerId==id покупця
+////        якщо є такий запис то ordersListsId(Postman)= id цього запису
+//// якщо немає то створюємо запис
+//
+//        return createGoodsOrders(goodsOrdersToSaveDTO);
+//    }
 //    @PostMapping("/createGoodsOrders")
 //    public ResponseEntity<GoodsOrdersDTO> createGoodsOrders(
 //            @RequestParam Long customersId,
@@ -220,6 +219,30 @@ public class GoodsOrdersController {
 //            return ResponseEntity.badRequest().body(new GoodsOrdersDTO());
 //        }
 //    }
+@PatchMapping("/{id}")
+public ResponseEntity<GoodsOrdersDTO> updateGoodsOrdersQuantity(@PathVariable Long id, @RequestBody Map<String, Integer> requestBody) {
+    try {
+        Integer newQuantity = requestBody.get("quantity");
+        GoodsOrdersDTO updatedGoodsOrder = goodsOrdersService.updateGoodsOrdersQuantity(id, newQuantity);
+
+        // Додайте вашу логіку оновлення кількості тут
+        // Наприклад, знайдіть товар за id і оновіть його кількість
+
+        return ResponseEntity.ok(updatedGoodsOrder);//"Кількість товару успішно оновлено"
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body(new GoodsOrdersDTO());
+    }
+}
+
+//    @PatchMapping("/{id}")
+//public ResponseEntity<GoodsOrdersDTO> updateGoodsOrdersQuantity(@PathVariable Long id, @RequestParam int quantity) {
+//    try {
+//        GoodsOrdersDTO updatedGoodsOrder = goodsOrdersService.updateGoodsOrdersQuantity(id, quantity);
+//        return ResponseEntity.ok(updatedGoodsOrder);
+//    } catch (GoodsOrdersNotFoundException e) {
+//        return ResponseEntity.notFound().build();
+//    }
+//}
 
     @GetMapping//виправлено 18.10.23 18:10
     public ResponseEntity<List<GoodsOrdersDTO>> getAll(HttpServletRequest request) {
@@ -228,10 +251,6 @@ public class GoodsOrdersController {
         return new ResponseEntity<>(goodsOrdersEntities, HttpStatus.OK);
     }
 
-    //    @GetMapping("/getAllByCustomer")//18.10 після 21 00
-//    public ResponseEntity<Iterable<GoodsOrdersEntity>> getAllByCustomer(@RequestParam Long id) {
-//        return new ResponseEntity<>(goodsOrdersService.getAllByCustomer(id), HttpStatus.OK);
-//    }
     @GetMapping("/getAllByCustomer")//22.10 23:30
     public ResponseEntity<Iterable<GoodsOrdersDTO>> getAllByCustomer(@RequestParam Long id) {
         Iterable<GoodsOrdersEntity> goodsOrdersByCustomer = goodsOrdersService.getAllByCustomer(id);
@@ -241,37 +260,9 @@ public class GoodsOrdersController {
 
 
     @GetMapping("/getOne")//18.10 після 21 00
-    public ResponseEntity<GoodsOrdersDTO> getOneGoodsOrders(@RequestParam Long id, HttpServletRequest request) {
-//        System.out.println("id: " + id);
+    public ResponseEntity<GoodsOrdersDTO> getOneGoodsOrders(@RequestParam Long id) {//, HttpServletRequest request
         try {
             GoodsOrdersDTO dto = goodsOrdersService.getOne(id);
-//
-////            GoodsInvoicesDTO goodsInvoicesDTO = goodsInvoicesService.getOne(dto.getGoodsInvoicesDTO().getId());
-////            goodsInvoicesDTO
-//            String currentUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-//
-//            List<PhotosGoodsDTO> photos = dto.getGoodsInvoicesDTO().getGoods().getPhotosGoodsDTOS();
-//            for (PhotosGoodsDTO photo : photos) {
-//                String imagePath = currentUrl + "/images/" + photo.getPath();
-//                photo.setPath(imagePath);
-//            }
-//
-//            GoodsInvoicesEntity entity = goodsInvoicesRepository.findById(id).orElse(new GoodsInvoicesEntity());
-//
-//            System.out.println("PropertiesGoods.size: " + entity.getGoods().getPropertiesGoods().size());
-//            List<PropertiesGoodsEntity> propertiesGoodsList = entity.getGoods().getPropertiesGoods();
-//            List<PropertiesGoodsDTO> propertiesDTOList = new ArrayList<>();
-//            for (PropertiesGoodsEntity propertiesGoods : propertiesGoodsList) {
-//                PropertiesNameGoodsEntity propertiesNameGoods = propertiesGoods.getPropertiesNameGoods();
-//                PropertiesGoodsDTO propertiesGoodsDTO = new PropertiesGoodsDTO();
-//                propertiesGoodsDTO.setId(propertiesGoods.getId());
-//                propertiesGoodsDTO.setValue(propertiesGoods.getValue());
-//                propertiesGoodsDTO.setPropertiesName(propertiesNameGoods.getName()); // Додаємо назву властивості
-//                propertiesGoodsDTO.setType(propertiesNameGoods.getValueType()); // Додаємо тип значення властивості
-//                propertiesDTOList.add(propertiesGoodsDTO);
-//            }
-//            dto.getGoodsInvoicesDTO().getGoods().setPropertiesGoodsDTOS(propertiesDTOList);
-
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new GoodsOrdersDTO()); // or handle the error

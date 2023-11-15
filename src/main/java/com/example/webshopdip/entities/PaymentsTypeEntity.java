@@ -16,17 +16,50 @@ import java.util.List;
  */
 @Entity
 @Table(name = "paymentstype")
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
+//@JsonIdentityInfo(
+//        generator = ObjectIdGenerators.PropertyGenerator.class,
+//        property = "id")
 public class PaymentsTypeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // Унікальний ідентифікатор Типу оплати
     private String payment_type; // Тип оплати
+
     /////////сутності що мають відношення One-to-Many з сутністю OrdersLists
     @OneToMany(mappedBy = "paymentsType")
     @JsonManagedReference
     // Зв'язок One-to-Many: Один Тип оплати за Товар може мати багато Переліків Товарів
     private List<OrdersListsEntity> ordersLists = new ArrayList<>();
+    public PaymentsTypeEntity() {
+    }
+    public PaymentsTypeEntity(Long id, String payment_type, List<OrdersListsEntity> ordersLists) {
+        this.id = id;
+        this.payment_type = payment_type;
+        this.ordersLists = ordersLists;
+    }
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getPayment_type() {
+        return payment_type;
+    }
+
+    public void setPayment_type(String payment_type) {
+        this.payment_type = payment_type;
+    }
+
+    public List<OrdersListsEntity> getOrdersLists() {
+        return ordersLists;
+    }
+
+    public void setOrdersLists(List<OrdersListsEntity> ordersLists) {
+        this.ordersLists = ordersLists;
+    }
+
+
 }

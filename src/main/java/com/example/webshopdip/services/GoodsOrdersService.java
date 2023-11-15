@@ -196,26 +196,54 @@ public class GoodsOrdersService {
 //}
     //public GoodsOrdersToSaveDTO createGoodsOrders(Long customersId, Long goodsInvoicesId) throws GoodsOrdersNotFoundException {
     public GoodsOrdersDTO createGoodsOrders(GoodsOrdersToSaveDTO goodsOrdersToSaveDTO) throws GoodsOrdersNotFoundException {
- /*
-          {
-    "goodsInvoicesId":4,   "ordersListsId":4,  "price": 100.0,   "quantity": 2
-}
+        /*
+         * {
+         *    "goodsInvoicesId":4,
+         *    "ordersListsId":4,
+         *    "price": 100.0,
+         *    "quantity": 2
+         * }
          */
-        GoodsOrdersEntity goodsOrdersEntity = new GoodsOrdersEntity();
-//        Optional<GoodsOrdersToSaveDTO> optional1 = goodsOrdersRepository.findById(goodsOrdersToSaveDTO.getId());
+        Long goodsInvoicesId = goodsOrdersToSaveDTO.getGoodsInvoicesId();
+        Long ordersListsId = goodsOrdersToSaveDTO.getOrdersListsId();
 
-        goodsOrdersEntity.setGoodsInvoices(goodsInvoicesRepository.findById(goodsOrdersToSaveDTO.getGoodsInvoicesId()).orElse(null));
-        goodsOrdersEntity.setOrdersLists(ordersListsRepository.findById(goodsOrdersToSaveDTO.getOrdersListsId()).orElse(null));
-        goodsOrdersEntity.setPrice(goodsOrdersToSaveDTO.getPrice());
-        goodsOrdersEntity.setQuantity(goodsOrdersToSaveDTO.getQuantity());
-        //перевіряємо чи є в ордер ліст запис без номера щодо данного покупця.
-        //якщо є то додаємо до того ід запису наш перелік товарів в кошик
-        //якщо немає то створюємо цей запис і додаємо перелік товарів
-        goodsOrdersRepository.save(goodsOrdersEntity);
-        return entityToDTO(goodsOrdersEntity);
+        // Перевіряємо, чи такий товар вже існує в замовленні -----,при необхідності створи обробку методу сервіс
+        Optional<GoodsOrdersEntity> existingGoodsOrders = goodsOrdersRepository.findByGoodsInvoicesIdAndOrdersListsId(goodsInvoicesId, ordersListsId);
+        if (existingGoodsOrders.isPresent()) {
+            // Змінюємо кількість, якщо товар вже існує в замовленні
+            GoodsOrdersEntity goodsOrdersEntity = existingGoodsOrders.get();
+            int newQuantity = goodsOrdersEntity.getQuantity() + 1;
+            goodsOrdersEntity.setQuantity(newQuantity);
 
+            // Зберігаємо змінений запис
+            goodsOrdersRepository.save(goodsOrdersEntity);
 
+            return entityToDTO(goodsOrdersEntity);
+        } else {
+            // Якщо товар не існує, виконуємо стандартний процес додавання
+            GoodsOrdersEntity goodsOrdersEntity = new GoodsOrdersEntity();
+            GoodsInvoicesEntity goodsInvoices = goodsInvoicesRepository.findById(goodsInvoicesId).orElse(null);
+            OrdersListsEntity ordersLists = ordersListsRepository.findById(ordersListsId).orElse(null);
+
+            if (goodsInvoices == null) {
+                throw new GoodsOrdersNotFoundException("GoodsInvoices not found with id: " + goodsInvoicesId);
+            }
+
+            if (ordersLists == null) {
+                throw new GoodsOrdersNotFoundException("OrdersLists not found with id: " + ordersListsId);
+            }
+
+            goodsOrdersEntity.setGoodsInvoices(goodsInvoices);
+            goodsOrdersEntity.setOrdersLists(ordersLists);
+            goodsOrdersEntity.setPrice(goodsOrdersToSaveDTO.getPrice());
+            goodsOrdersEntity.setQuantity(goodsOrdersToSaveDTO.getQuantity());
+
+            goodsOrdersRepository.save(goodsOrdersEntity);
+            return entityToDTO(goodsOrdersEntity);
+        }
     }
+
+
 
 
     public GoodsOrdersDTO entityToDTO(GoodsOrdersEntity entity) {//21.10 00:40
@@ -238,7 +266,16 @@ public class GoodsOrdersService {
         return dto;
     }
 
+    @Transactional
+    public GoodsOrdersDTO updateGoodsOrdersQuantity(Long id, int quantity) throws GoodsOrdersNotFoundException {
+        GoodsOrdersEntity goodsOrdersEntity = goodsOrdersRepository.findById(id).orElseThrow(()
+                -> new GoodsOrdersNotFoundException("GoodsOrders not found with id: " + id));
 
+        goodsOrdersEntity.setQuantity(quantity);
+
+        GoodsOrdersEntity updatedEntity = goodsOrdersRepository.save(goodsOrdersEntity);
+        return entityToDTO(updatedEntity);
+    }
     public List<GoodsOrdersDTO> getAll(HttpServletRequest request) {
         List<GoodsOrdersEntity> goodsOrdersEntities = goodsOrdersRepository.findAll();
 
