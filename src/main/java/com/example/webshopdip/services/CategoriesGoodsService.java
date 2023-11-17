@@ -33,7 +33,7 @@ public class CategoriesGoodsService {
 
     public CategoriesGoodsDTO createCategoriesGoods(CategoriesGoodsDTO dto) throws CategoriesGoodsAlreadyExistException {
         if (categoriesGoodsRepository.findByName(dto.getName()) != null) {
-            throw new CategoriesGoodsAlreadyExistException("Така категорія вже існує");
+            throw new CategoriesGoodsAlreadyExistException("Такий тип оплати вже існує");
         }
 
         CategoriesGoodsEntity entity = new CategoriesGoodsEntity();

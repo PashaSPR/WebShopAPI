@@ -24,4 +24,37 @@ public class DeliveriesMethodEntity {
     @JsonManagedReference
     // Зв'язок One-to-Many: Один Метод доставки Товарів може мати багато Переліків Товарів
     private List<OrdersListsEntity> ordersLists = new ArrayList<>();
+
+    public DeliveriesMethodEntity(Long id, String method, List<OrdersListsEntity> ordersLists) {
+        this.id = id;
+        this.method = method;
+        this.ordersLists = ordersLists;
+    }
+
+    public DeliveriesMethodEntity() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public List<OrdersListsEntity> getOrdersLists() {
+        return ordersLists;
+    }
+
+    public void setOrdersLists(List<OrdersListsEntity> ordersLists) {
+        this.ordersLists = ordersLists;
+    }
 }
