@@ -23,7 +23,7 @@ public class PaymentsTypeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // Унікальний ідентифікатор Типу оплати
-    private String payment_type; // Тип оплати
+    private String paymentType;; // Тип оплати
 
     /////////сутності що мають відношення One-to-Many з сутністю OrdersLists
     @OneToMany(mappedBy = "paymentsType")
@@ -32,11 +32,12 @@ public class PaymentsTypeEntity {
     private List<OrdersListsEntity> ordersLists = new ArrayList<>();
     public PaymentsTypeEntity() {
     }
-    public PaymentsTypeEntity(Long id, String payment_type, List<OrdersListsEntity> ordersLists) {
+    public PaymentsTypeEntity(Long id, String paymentType, List<OrdersListsEntity> ordersLists) {
         this.id = id;
-        this.payment_type = payment_type;
+        this.paymentType = paymentType;
         this.ordersLists = ordersLists;
     }
+
     public Long getId() {
         return id;
     }
@@ -45,12 +46,12 @@ public class PaymentsTypeEntity {
         this.id = id;
     }
 
-    public String getPayment_type() {
-        return payment_type;
+    public String getPaymentType() {
+        return paymentType;
     }
 
-    public void setPayment_type(String payment_type) {
-        this.payment_type = payment_type;
+    public void setPaymentType(String paymentType) {
+        this.paymentType = paymentType;
     }
 
     public List<OrdersListsEntity> getOrdersLists() {
@@ -60,6 +61,4 @@ public class PaymentsTypeEntity {
     public void setOrdersLists(List<OrdersListsEntity> ordersLists) {
         this.ordersLists = ordersLists;
     }
-
-
 }
