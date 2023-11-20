@@ -17,7 +17,7 @@ public class DeliveriesMethodController {
     @Autowired
     private DeliveriesMethodService deliveriesMethodService;
 
-<<<<<<< HEAD
+
     @PostMapping
     public ResponseEntity<DeliveriesMethodEntity> createDeliveriesMethod(@RequestBody DeliveriesMethodEntity deliveriesMethodEntity) {
         try {
@@ -34,19 +34,18 @@ public class DeliveriesMethodController {
 //            entity.setMethod(method);
 //            deliveriesMethodRepository.save(entity);
 //            return ResponseEntity.ok(entity);
-=======
+
 //    @PostMapping
 //    public ResponseEntity<DeliveriesMethodEntity> createDeliveriesMethod(@RequestBody DeliveriesMethodEntity deliveriesMethodEntity) {
 //        try {
 //            DeliveriesMethodEntity createdDeliveriesMethod = deliveriesMethodService.createDeliveriesMethod(deliveriesMethodEntity);
 //            return ResponseEntity.ok(createdDeliveriesMethod);
->>>>>>> origin/devPasha
+
 //        } catch (Exception ex) {
 //            return ResponseEntity.badRequest().body(new DeliveriesMethodEntity());
 //        }
 //    }
-<<<<<<< HEAD
-=======
+
     @PostMapping
     public ResponseEntity<DeliveriesMethodEntity> createDeliveriesMethod(@RequestParam String method) {
         try {
@@ -58,7 +57,7 @@ public class DeliveriesMethodController {
             return ResponseEntity.badRequest().body(new DeliveriesMethodEntity());
         }
     }
->>>>>>> origin/devPasha
+
 
     @GetMapping
     public ResponseEntity<Iterable<DeliveriesMethodEntity>> getAll() {
